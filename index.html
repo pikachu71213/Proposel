@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>A Love Story for Rupali</title>
+  
+  <!-- Premium Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Great+Vibes&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Loading Overlay -->
+  <div id="loader" class="loader-overlay">
+    <div class="loader-content">
+      <div class="loader-heart">❤️</div>
+      <p class="loader-text">Preparing a Royal Love Story...</p>
+    </div>
+  </div>
+
+  <!-- Background Music Element -->
+  <audio id="bg-music" loop preload="auto">
+    <!-- A beautiful, royalty-free soft romantic piano & violin piece -->
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Ambient Particle Background (Fixed) -->
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- Floating Audio HUD Control -->
+  <button id="audio-toggle" class="audio-hud-btn" aria-label="Toggle Music">
+    <span class="music-icon">🎵</span>
+    <span class="music-wave-container">
+      <span class="wave-bar"></span>
+      <span class="wave-bar"></span>
+      <span class="wave-bar"></span>
+    </span>
+  </button>
+
+  <!-- 3D Landing Canvas Container (Covers entire screen, holds the invitation and wax seal) -->
+  <div id="intro-container">
+    <canvas id="intro-canvas"></canvas>
+    
+    <!-- Pulse Prompt Overlay -->
+    <div id="landing-prompt" class="landing-prompt-container">
+      <div class="prompt-text-engraved">Touch the Love Seal</div>
+      <div class="prompt-arrow">▼</div>
+    </div>
+  </div>
+
+  <!-- Main Scrollable Content -->
+  <main id="main-content">
+    
+    <!-- Section 1: Inner Invitation (Proposal Letter) -->
+    <section id="proposal-letter-section" class="scroll-section">
+      <div class="glass-card letter-container">
+        <div class="letter-border">
+          <div class="ornament ornament-top">⚜</div>
+          
+          <h2 class="letter-salutation">My Dearest Rupali ❤️</h2>
+          
+          <div class="letter-paragraphs">
+            <p class="reveal-line">From the very first moment you entered my life, everything changed.</p>
+            
+            <p class="reveal-line">Every smile became brighter.</p>
+            <p class="reveal-line">Every dream became more meaningful.</p>
+            <p class="reveal-line">Every heartbeat started carrying your name.</p>
+            
+            <p class="reveal-line">Life feels beautiful because you are a part of it.</p>
+            
+            <p class="reveal-line">You are my happiness, my peace, my strength, and the most beautiful blessing I have ever received.</p>
+            
+            <p class="reveal-line">Every day I imagine a future where we laugh together, grow together, travel together, build our dreams together, and grow old while holding each other's hands.</p>
+            
+            <p class="reveal-line font-italic">I don't want just moments with you...</p>
+            <p class="reveal-line font-bold">I want an entire lifetime with you.</p>
+            
+            <p class="reveal-line">Through every sunrise.</p>
+            <p class="reveal-line">Through every challenge.</p>
+            <p class="reveal-line">Through every success.</p>
+            <p class="reveal-line">Through every season of life.</p>
+            
+            <p class="reveal-line">I promise to respect you, support you, protect your dreams, stand beside you, and love you endlessly.</p>
+            
+            <p class="reveal-line letter-close">My heart has already chosen you.</p>
+          </div>
+          
+          <div class="ornament ornament-bottom">⚜</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Grand Proposal & Diamond Ring -->
+    <section id="grand-proposal-section" class="scroll-section">
+      <div class="proposal-visual-backdrop">
+        <!-- Spotlight behind 3D Ring is rendered in canvas, but we can set up lighting effects here -->
+        <div class="spotlight-heart"></div>
+      </div>
+
+      <div class="proposal-container">
+        <h2 class="animated-proposal-title">
+          <span class="word">I</span>
+          <span class="word">LOVE</span>
+          <span class="word">YOU</span>
+          <span class="word-highlight">RUPALI</span>
+          <span class="word">❤️</span>
+        </h2>
+        
+        <!-- 3D Diamond Ring Canvas -->
+        <div id="diamond-ring-wrapper">
+          <canvas id="ring-canvas"></canvas>
+        </div>
+
+        <h3 class="proposal-question">Will You Marry Me?</h3>
+
+        <!-- Interactive YES Button -->
+        <div class="button-wrapper">
+          <button id="yes-button" class="premium-button">
+            <span class="btn-shine"></span>
+            💍 YES, FOREVER ❤️
+          </button>
+        </div>
+
+        <!-- Happy Success Screen (Fades in over proposal area on YES click) -->
+        <div id="happy-overlay" class="happy-overlay-hidden">
+          <div class="happy-content glass-card">
+            <div class="happy-ornament">🕊️</div>
+            <h2 class="happy-title">YES, FOREVER!</h2>
+            <p class="happy-text">You Just Made Me The Happiest Person In The World ❤️</p>
+            <div class="happy-footer-decor">✨ Forever & Always ✨</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Love Timeline & Memory Placeholders -->
+    <section id="timeline-section" class="scroll-section">
+      <h2 class="section-title">Our Romantic Journey</h2>
+      
+      <div class="timeline-container">
+        <!-- Vertical timeline line -->
+        <div class="timeline-line"></div>
+
+        <!-- Timeline Step 1 -->
+        <div class="timeline-item left-item">
+          <div class="timeline-badge">1</div>
+          <div class="glass-card timeline-card">
+            <div class="photo-frame">
+              <img src="assets/user_selfie.png" alt="Our Selfie" class="memory-img" loading="lazy">
+              <div class="frame-overlay"></div>
+            </div>
+            <h3 class="memory-title">Where It All Began</h3>
+            <span class="memory-date">A Sweet Memory</span>
+            <p class="memory-description">Your beautiful smile and those eyes behind the glasses captured my heart from the very start. Sitting next to you, watching you smile, is my favorite place to be.</p>
+          </div>
+        </div>
+
+        <!-- Timeline Step 2 -->
+        <div class="timeline-item right-item">
+          <div class="timeline-badge">2</div>
+          <div class="glass-card timeline-card">
+            <div class="photo-frame">
+              <img src="assets/user_walk.jpg" alt="Walking Together" class="memory-img" loading="lazy">
+              <div class="frame-overlay"></div>
+            </div>
+            <h3 class="memory-title">Walking Hand-in-Hand</h3>
+            <span class="memory-date">Steps of Love</span>
+            <p class="memory-description">Laughter on our faces, walking together under the open sky. I promise to walk beside you, matching your steps and supporting your dreams, through all of life's journeys.</p>
+          </div>
+        </div>
+
+        <!-- Timeline Step 3 -->
+        <div class="timeline-item left-item">
+          <div class="timeline-badge">3</div>
+          <div class="glass-card timeline-card">
+            <div class="photo-frame">
+              <img src="assets/memory_3.jpg" alt="Our Future Dream" class="memory-img" loading="lazy">
+              <div class="frame-overlay"></div>
+            </div>
+            <h3 class="memory-title">Our Future Together</h3>
+            <span class="memory-date">Promises of Tomorrow</span>
+            <p class="memory-description">Under the blooming blossoms of our dreams, I imagine a lifetime of holding your hand, building a home, laughing through challenges, and growing old together.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Romantic Quotes & Epilogue -->
+    <section id="epilogue-section" class="scroll-section">
+      <div class="glass-card quotes-container">
+        <p class="romantic-quote">"In all the world, there is no heart for me like yours. In all the world, there is no love for you like mine."</p>
+        <span class="quote-author">— Maya Angelou</span>
+      </div>
+
+      <!-- Floating Lanterns Visual Effect area -->
+      <div class="lantern-scene">
+        <!-- Rendered dynamically or via CSS -->
+      </div>
+      
+      <footer class="epilogue-footer">
+        <p class="handwritten-note">With all my love, forever yours.</p>
+        <p class="copyright-info">Created for Rupali | 2026</p>
+      </footer>
+    </section>
+
+  </main>
+
+  <!-- External Library Dependencies -->
+  <!-- Three.js (3D Library) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- GSAP (Core GreenSock Animation Platform) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <!-- GSAP ScrollTrigger (Scroll animations) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <!-- Lenis (Smooth Scroll) -->
+  <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
+  <!-- Canvas Confetti (Fireworks & Celebrations) -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Custom Scripts -->
+  <script src="particles.js"></script>
+  <script src="audio.js"></script>
+  <script src="scene3d.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
