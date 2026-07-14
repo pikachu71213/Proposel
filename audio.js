@@ -1,6 +1,5 @@
 class AudioController {
   constructor() {
-    this.music = document.getElementById('bg-music');
     this.toggleBtn = document.getElementById('audio-toggle');
     this.isPlaying = false;
     this.heartbeatInterval = null;
@@ -8,14 +7,56 @@ class AudioController {
     this.heartbeatActive = false;
     this.bpm = 65;
     
+    this.playerReady = false;
+    this.player = null;
+    
+    this.initYouTubePlayer();
     this.initEvents();
+  }
+
+  initYouTubePlayer() {
+    // Dynamically load YouTube API
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    
+    window.onYouTubeIframeAPIReady = () => {
+      this.player = new YT.Player('bg-music-player', {
+        height: '1',
+        width: '1',
+        videoId: 'DT9fEmSL_Lw',
+        playerVars: {
+          'autoplay': 0,
+          'loop': 1,
+          'playlist': 'DT9fEmSL_Lw',
+          'start': 30,
+          'controls': 0,
+          'disablekb': 1,
+          'fs': 0,
+          'modestbranding': 1,
+          'rel': 0,
+          'showinfo': 0
+        },
+        events: {
+          'onReady': () => {
+            this.playerReady = true;
+            this.player.setVolume(50);
+            this.player.seekTo(30, true);
+          },
+          'onStateChange': (event) => {
+            if (event.data === YT.PlayerState.ENDED) {
+              this.player.seekTo(30, true);
+              this.player.playVideo();
+            }
+          }
+        }
+      });
+    };
   }
 
   initEvents() {
     this.toggleBtn.addEventListener('click', () => this.toggleMusic());
-    
-    // Low music volume by default to prevent sudden noise
-    this.music.volume = 0.5;
   }
 
   initAudioContext() {
@@ -38,35 +79,58 @@ class AudioController {
 
   play() {
     this.initAudioContext();
-    this.music.play().then(() => {
+    if (this.playerReady && this.player) {
+      if (this.player.getCurrentTime() < 30) {
+        this.player.seekTo(30, true);
+      }
+      this.player.playVideo();
       this.isPlaying = true;
       this.toggleBtn.classList.add('playing');
       
       // Fade music in slowly
-      gsap.to(this.music, { volume: 0.5, duration: 2 });
-    }).catch(err => {
-      console.log("Audio autoplay prevented, waiting for user gesture.", err);
-    });
+      let vol = { value: 0 };
+      this.player.setVolume(0);
+      gsap.to(vol, {
+        value: 50,
+        duration: 2.0,
+        onUpdate: () => {
+          if (this.isPlaying) this.player.setVolume(vol.value);
+        }
+      });
+    } else {
+      setTimeout(() => this.play(), 200);
+    }
   }
 
   pause() {
     this.isPlaying = false;
     this.toggleBtn.classList.remove('playing');
     
-    // Fade out then pause
-    gsap.to(this.music, { 
-      volume: 0, 
-      duration: 0.8,
-      onComplete: () => {
-        if (!this.isPlaying) this.music.pause();
-      }
-    });
+    if (this.playerReady && this.player) {
+      let vol = { value: this.player.getVolume() };
+      gsap.to(vol, { 
+        value: 0, 
+        duration: 0.8,
+        onUpdate: () => {
+          this.player.setVolume(vol.value);
+        },
+        onComplete: () => {
+          if (!this.isPlaying) this.player.pauseVideo();
+        }
+      });
+    }
   }
 
   swellMusic() {
-    // Swell music volume for the YES celebration
-    if (this.isPlaying) {
-      gsap.to(this.music, { volume: 0.9, duration: 1.5 });
+    if (this.isPlaying && this.playerReady && this.player) {
+      let vol = { value: this.player.getVolume() };
+      gsap.to(vol, {
+        value: 90,
+        duration: 1.5,
+        onUpdate: () => {
+          this.player.setVolume(vol.value);
+        }
+      });
     }
   }
 

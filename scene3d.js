@@ -88,7 +88,7 @@ class InvitationScene {
     ctx.fillStyle = '#5A1E2D';
     ctx.fillRect(0, 0, size, size);
     
-    // Double circular border
+    // Double circular border (will be stretched to oval by mesh scale)
     ctx.strokeStyle = '#D4AF37';
     ctx.lineWidth = 14;
     ctx.beginPath();
@@ -101,21 +101,25 @@ class InvitationScene {
     ctx.arc(size/2, size/2, size/2 - 50, 0, Math.PI * 2);
     ctx.stroke();
     
-    // Initial "R" and Heart drawing (Gold engraved)
+    // Initial "R" and Heart drawing (Gold engraved, counter-scaled for oval mesh stretch)
+    ctx.save();
+    ctx.translate(size/2, size/2);
+    ctx.scale(1.35, 0.95);
+    
     ctx.fillStyle = '#D4AF37';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     
-    // Draw Elegant Heart at center
     ctx.shadowBlur = 10;
     ctx.shadowColor = 'rgba(212,175,55,0.5)';
     ctx.font = 'bold 160px "Cinzel"';
-    ctx.fillText('R', size/2, size/2 - 20);
+    ctx.fillText('R', 0, -25);
     
     // Draw Heart below R
     ctx.font = '60px "Cinzel"';
-    ctx.fillText('❤️', size/2, size/2 + 100);
+    ctx.fillText('❤️', 0, 95);
     
+    ctx.restore();
     return canvas;
   }
 
@@ -150,7 +154,7 @@ class InvitationScene {
     this.scene.add(this.cardGroup);
     
     // Card dimensions
-    const cardW = 6.4;
+    const cardW = 5.4;
     const cardH = 9.0;
     const thickness = 0.08;
     
@@ -238,7 +242,8 @@ class InvitationScene {
     const sealCanvas = this.generateSealCanvas();
     const sealTex = new THREE.CanvasTexture(sealCanvas);
     
-    const sealGeom = new THREE.CylinderGeometry(0.7, 0.7, 0.1, 32);
+    // Cylinder is smaller to scale it to oval shape
+    const sealGeom = new THREE.CylinderGeometry(0.55, 0.55, 0.1, 32);
     const sealMat = new THREE.MeshStandardMaterial({
       color: 0x5a1e2d,
       roughness: 0.3,
@@ -253,31 +258,64 @@ class InvitationScene {
     this.waxSeal = new THREE.Mesh(sealGeom, sealMat);
     this.waxSeal.rotation.x = Math.PI / 2;
     this.waxSeal.position.set(0, 0, thickness / 2 + 0.04);
+    this.waxSeal.scale.set(0.82, 1.0, 1.12); // Portrait Oval Scale
     this.waxSeal.castShadow = true;
     this.cardGroup.add(this.waxSeal);
+    
+    // Gold outer rim for the wax seal to make it look extra premium
+    const goldRimGeom = new THREE.CylinderGeometry(0.57, 0.57, 0.08, 32);
+    const goldRimMat = new THREE.MeshStandardMaterial({
+      color: 0xd4af37,
+      roughness: 0.15,
+      metalness: 0.95,
+      clearcoat: 1.0
+    });
+    this.waxSealGoldRim = new THREE.Mesh(goldRimGeom, goldRimMat);
+    this.waxSealGoldRim.rotation.x = Math.PI / 2;
+    this.waxSealGoldRim.position.set(0, 0, thickness / 2 + 0.02);
+    this.waxSealGoldRim.scale.set(0.85, 1.0, 1.15); // Portrait Oval Scale
+    this.waxSealGoldRim.castShadow = true;
+    this.cardGroup.add(this.waxSealGoldRim);
     
     // Create gold embossed ornaments on cover fronts (mocked via child planes)
     this.createEmbossedBorders(leftFlapMesh, rightFlapMesh, cardW, cardH);
   }
 
   createEmbossedBorders(leftFlap, rightFlap, cardW, cardH) {
-    const borderMat = new THREE.MeshStandardMaterial({
+    const goldMat = new THREE.MeshStandardMaterial({
       color: 0xd4af37,
-      roughness: 0.2,
-      metalness: 0.9,
+      roughness: 0.15,
+      metalness: 0.95,
       side: THREE.DoubleSide
     });
+
+    const burgundyMat = new THREE.MeshStandardMaterial({
+      color: 0x5a1e2d,
+      roughness: 0.6,
+      metalness: 0.1
+    });
     
-    // Thin box outlines representing embossed gold borders
-    const borderGeom = new THREE.BoxGeometry(cardW/2 - 0.4, cardH - 0.8, 0.01);
+    // Outer raised gold frame
+    const goldGeom = new THREE.BoxGeometry(cardW/2 - 0.4, cardH - 0.8, 0.01);
     
-    const leftBorder = new THREE.Mesh(borderGeom, borderMat);
-    leftBorder.position.set(0, 0, 0.045);
-    leftFlap.add(leftBorder);
+    const leftGold = new THREE.Mesh(goldGeom, goldMat);
+    leftGold.position.set(0, 0, 0.045);
+    leftFlap.add(leftGold);
     
-    const rightBorder = new THREE.Mesh(borderGeom, borderMat);
-    rightBorder.position.set(0, 0, 0.045);
-    rightFlap.add(rightBorder);
+    const rightGold = new THREE.Mesh(goldGeom, goldMat);
+    rightGold.position.set(0, 0, 0.045);
+    rightFlap.add(rightGold);
+    
+    // Inner burgundy panel to expose the gold frame border
+    const innerBurgundyGeom = new THREE.BoxGeometry(cardW/2 - 0.52, cardH - 1.04, 0.012);
+    
+    const leftInner = new THREE.Mesh(innerBurgundyGeom, burgundyMat);
+    leftInner.position.set(0, 0, 0.001);
+    leftGold.add(leftInner);
+    
+    const rightInner = new THREE.Mesh(innerBurgundyGeom, burgundyMat);
+    rightInner.position.set(0, 0, 0.001);
+    rightGold.add(rightInner);
   }
 
   setupInteraction() {
@@ -362,6 +400,7 @@ class InvitationScene {
   crackSealFragments() {
     // Hide original solid wax seal mesh
     this.waxSeal.visible = false;
+    if (this.waxSealGoldRim) this.waxSealGoldRim.visible = false;
     
     // Spawn 10 fragmented geometry shards at center
     const shardGroup = new THREE.Group();
@@ -491,7 +530,10 @@ class InvitationScene {
       
       // Breathe wax seal scale
       const sealScale = 1.0 + Math.sin(time * 2.0) * 0.03;
-      this.waxSeal.scale.set(sealScale, 1.0, sealScale);
+      this.waxSeal.scale.set(sealScale * 0.82, 1.0, sealScale * 1.12);
+      if (this.waxSealGoldRim) {
+        this.waxSealGoldRim.scale.set(sealScale * 0.85, 1.0, sealScale * 1.15);
+      }
     }
     
     this.renderer.render(this.scene, this.camera);
